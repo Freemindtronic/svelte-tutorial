@@ -10,11 +10,13 @@ module.exports = {
   ignorePatterns: ['*.cjs'],
   overrides: [{ files: ['*.svelte'], processor: 'svelte3/svelte3' }],
   settings: {
-    'svelte3/typescript': () => require('typescript'),
+    'svelte3/typescript': true,
+    'svelte3/ignore-styles': () => true,
   },
   parserOptions: {
     sourceType: 'module',
     ecmaVersion: 2019,
+    extraFileExtensions: ['.svelte'],
   },
   env: {
     browser: true,
