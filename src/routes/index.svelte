@@ -1,30 +1,26 @@
 <script lang="ts">
   import { Item } from '$lib/todo'
+  import List from '../components/List.svelte'
 
-  let items: Item[] = []
+  let todo: Item[] = []
+  let done: Item[] = []
 
   let task = ''
+
+  $: {
+    const previous = { todo, done }
+    // Always put updated items at the end of the array
+    todo = [...previous.todo, ...previous.done].filter((item) => !item.done)
+    done = [...previous.done, ...previous.todo].filter((item) => item.done)
+  }
 </script>
 
 <main>
   <h1>Todo</h1>
-  {#each items as item (item.id)}
-    <p class="task">
-      <input type="checkbox" bind:checked={item.done} id="task-{item.id}" />
-      <label for="task-{item.id}" class:done={item.done}>{item.task} </label>
-      <button
-        type="button"
-        on:click={() => {
-          items = items.filter((i) => i.id !== item.id)
-        }}>Remove</button
-      >
-    </p>
-  {:else}
-    <p><em>Nothing to do...</em></p>
-  {/each}
+  <List bind:items={todo} />
   <form
     on:submit|preventDefault={() => {
-      items = [...items, new Item(task)]
+      todo = [...todo, new Item(task)]
       task = ''
     }}
   >
@@ -34,6 +30,16 @@
       <button>Add</button>
     </p>
   </form>
+  {#if done.length}
+    <h2>
+      Done <button
+        on:click={() => {
+          done = []
+        }}>Remove all</button
+      >
+    </h2>
+    <List bind:items={done} />
+  {/if}
 </main>
 
 <style lang="scss">
@@ -72,24 +78,5 @@
       border-radius: 2px;
       padding: 0.5em;
     }
-  }
-
-  input[type='checkbox'] {
-    width: 1rem;
-    height: 1rem;
-  }
-
-  .task {
-    display: flex;
-    gap: 0.5em;
-    align-items: center;
-
-    > label {
-      flex: 1;
-    }
-  }
-
-  .done {
-    text-decoration: line-through;
   }
 </style>
